@@ -45,7 +45,10 @@ public:
 	CameraStateX* cam = nullptr;
 public:
 	// Variables
+	bool NoMoveWithKeys = false;
+	float MovementSpeed = 1.0f;
 	float ColorScaleStrength = 1.0f;
 	Vector ColorScaleColor;
 	Vector DefaultFocus;
+
 };
