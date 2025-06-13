@@ -55,6 +55,33 @@ void FreeCamMenu::onLoad()
 			}
 		}
 	});
+	// Vyncs MainMenuChanger.cpp
+	//https://github.com/Vyncc/MainMenuChanger/blob/2f466d8c7d57e6cd97e92ffcd74898a8eb1f80d7/MainMenuChanger/MainMenuChanger.cpp#L60
+	gameWrapper->HookEventWithCaller<ActorWrapper>(
+		"Function TAGame.CarPreviewActor_TA.Tick", 
+		[this](ActorWrapper caller, ...)
+	{
+		static bool SetDefault = true;
+		// is valid PreviewActor 
+		if (!caller.GetbHidden() && !caller.GetbHiddenSelf() && caller.GetOwner())
+		{
+			// ActorWrapper::SetLocation doesnt work here
+			// so we cast to a CameraWrapper as another Actor to where SetLocation does work.
+			CameraWrapper previewActor = CameraWrapper(caller.memory_address);
+			if (SetDefault)
+			{
+				CarPos = previewActor.GetLocation();
+				CarRotation = previewActor.GetRotation();
+				SetDefault = false;
+			}
+			
+			previewActor.SetLocation(CarPos);
+
+			caller.SetRotation(CarRotation);
+			caller.SetDrawScale(CarDrawScale);
+		}
+	});
+
 }
 
 void FreeCamMenu::RenderSettings()
@@ -95,13 +122,16 @@ void FreeCamMenu::RenderSettings()
 	if (ImGui::Button("Default"))
 		cam->currentOrientation.focus = DefaultFocus;
 
-	ImGui::DragFloat3("Car Pos", &CarPos.X);
-
 	if (ImGui::ColorEdit3("ColorScale (tint)", &ColorScaleColor.X))
 		camera->SetColorScale(ColorScaleColor * ColorScaleStrength);
 
 	if (ImGui::SliderFloat("ColorScale Strength", &ColorScaleStrength, 0.0f, 10.0f))
 		camera->SetColorScale(ColorScaleColor * ColorScaleStrength);
 	
+	ImGui::Separator();
+	ImGui::Text("Car");
+	ImGui::DragFloat3("Car Pos", &CarPos.X);
+	ImGui::DragInt3("Car Rot", &CarRotation.Pitch);
+	ImGui::DragFloat("Draw Scale", &CarDrawScale);
 
 }

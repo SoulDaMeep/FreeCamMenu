@@ -51,4 +51,6 @@ public:
 	Vector ColorScaleColor;
 	Vector DefaultFocus;
 	Vector CarPos;
+	Rotator CarRotation;
+	float CarDrawScale = 1.0f;
 };
