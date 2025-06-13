@@ -14,20 +14,24 @@ void FreeCamMenu::onLoad()
 		if (!cam || NoMoveWithKeys) return;
 
 		Rotator rot = cam->RotationOffset;
-		rot.Pitch += -385;
-		rot.Yaw += 25752;
-		float yaw_rads = rot.Yaw * CONST_UnrRotToRad;
-		float pitch_rads = rot.Pitch * CONST_UnrRotToRad;
-		float x = cos(yaw_rads);
-		float y = sin(yaw_rads);
-		float z = 0;
-		Vector forward = Vector(x, y, z);
-		Vector right = RotateVectorWithQuat(forward, RotatorToQuat(VectorToRotator(Axis::Right)));
-		right = RotateVectorWithQuat(right, RotatorToQuat(VectorToRotator(Axis::Right)));
+		
+		// These are the default rotations of the camera
+		// think of these as local default
+		rot.Pitch += cam->currentOrientation.rotation.Pitch;
+		rot.Yaw += cam->currentOrientation.rotation.Yaw;
 
-		Vector up = Vector::cross(forward, right);
+		
+		Quat q = RotatorToQuat(rot);
+		// Rotate the rotation of the camera off of axis
+		Vector forward = RotateVectorWithQuat(Axis::Forward, q);
+		Vector right = RotateVectorWithQuat(Axis::Right, q);
+		//Vector up      = RotateVectorWithQuat(Axis::Up,      q);
+		//Vector up    = Vector::Cros(forward, right);
+
 		ImGuiIO& io = ImGui::GetIO();
-		for (int i = 0; i < 512; ++i) {
+		// 'W' is 87 so loop until that point
+		// 'W' being the largest char as an int
+		for (int i = 0; i < 88; ++i) {
 			if (!io.KeysDown[i]) continue;
 			switch (i) {
 				case ' ':
@@ -88,9 +92,10 @@ void FreeCamMenu::RenderSettings()
 	ImGui::SliderInt("Roll", &cam->currentOrientation.rotation.Roll, -32768, 32768);
 	ImGui::SliderFloat("FOV", &cam->currentOrientation.fov, 0.0f, 360.0f);
 	ImGui::DragFloat3("FocusPoint", &cam->currentOrientation.focus.X); ImGui::SameLine();
-
 	if (ImGui::Button("Default"))
 		cam->currentOrientation.focus = DefaultFocus;
+
+	ImGui::DragFloat3("Car Pos", &CarPos.X);
 
 	if (ImGui::ColorEdit3("ColorScale (tint)", &ColorScaleColor.X))
 		camera->SetColorScale(ColorScaleColor * ColorScaleStrength);

@@ -10,8 +10,8 @@ constexpr auto plugin_version = stringify(VERSION_MAJOR) "." stringify(VERSION_M
 
 namespace Axis
 {
-	const Vector Right = Vector(0.5f, 0.5f, 0.0f);
-	const Vector Forward = Vector(-0.5f, 0.5f, 0.5f);
+	const Vector Right = Vector(0.0f, 1.0f, 0.0f);
+	const Vector Forward = Vector(1.0, 0.0f, 0.0f);
 	const Vector Up = Vector(0.0f, 0.0f, 1.0f);
 };
 
@@ -50,5 +50,5 @@ public:
 	float ColorScaleStrength = 1.0f;
 	Vector ColorScaleColor;
 	Vector DefaultFocus;
-
+	Vector CarPos;
 };
